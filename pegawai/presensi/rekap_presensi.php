@@ -11,14 +11,31 @@ $judul = 'Rekap Presensi';
 include('../layout/header.php');
 include_once('../../config.php');
 
+$id = $_SESSION['id'];
 if (empty($_GET['tanggal_dari'])) {
-    $id = $_SESSION['id'];
-    $result = mysqli_query($connection, "SELECT * FROM presensi WHERE id_pegawai = '$id' ORDER BY tanggal_masuk DESC");
+    $query_count = "SELECT COUNT(*) as total FROM presensi WHERE id_pegawai = '$id'";
 } else {
-    $id = $_SESSION['id'];
     $tanggal_dari = $_GET['tanggal_dari'];
     $tanggal_sampai = $_GET['tanggal_sampai'];
-    $result = mysqli_query($connection, "SELECT * FROM presensi WHERE id_pegawai = '$id' AND tanggal_masuk BETWEEN '$tanggal_dari' AND '$tanggal_sampai' ORDER BY tanggal_masuk DESC");
+    $query_count = "SELECT COUNT(*) as total FROM presensi WHERE id_pegawai = '$id' AND tanggal_masuk BETWEEN '$tanggal_dari' AND '$tanggal_sampai'";
+}
+
+$count_result = mysqli_query($connection, $query_count);
+$total_data = mysqli_fetch_assoc($count_result)['total'];
+
+// Tentukan jumlah data per halaman
+$limit = 10; // Jumlah data per halaman
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$offset = ($page - 1) * $limit;
+
+// Hitung total halaman
+$total_pages = ceil($total_data / $limit);
+
+// Perbarui query untuk data presensi dengan limit dan offset
+if (empty($_GET['tanggal_dari'])) {
+    $result = mysqli_query($connection, "SELECT * FROM presensi WHERE id_pegawai = '$id' ORDER BY tanggal_masuk DESC LIMIT $limit OFFSET $offset");
+} else {
+    $result = mysqli_query($connection, "SELECT * FROM presensi WHERE id_pegawai = '$id' AND tanggal_masuk BETWEEN '$tanggal_dari' AND '$tanggal_sampai' ORDER BY tanggal_masuk DESC LIMIT $limit OFFSET $offset");
 }
 
 $lokasi_presensi = $_SESSION['lokasi_presensi'];
@@ -44,8 +61,10 @@ endwhile;
             <div class="col-md-10">
                 <form method="GET">
                     <div class="input-group">
-                        <input type="date" class="form-control" name="tanggal_dari">
-                        <input type="date" class="form-control" name="tanggal_sampai">
+                        <input type="date" class="form-control" name="tanggal_dari"
+                            value="<?= $_GET['tanggal_dari'] ?? '' ?>">
+                        <input type="date" class="form-control" name="tanggal_sampai"
+                            value="<?= $_GET['tanggal_sampai'] ?? '' ?>">
                         <button type="submit" class="btn btn-primary">Tampilkan</button>
                     </div>
                 </form>
@@ -123,6 +142,27 @@ endwhile;
             <?php } ?>
 
         </table>
+
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                <li class="page-item <?= ($page <= 1) ? 'disabled' : '' ?>">
+                    <a class="page-link"
+                        href="?page=<?= $page - 1 ?>&tanggal_dari=<?= $_GET['tanggal_dari'] ?? '' ?>&tanggal_sampai=<?= $_GET['tanggal_sampai'] ?? '' ?>">Previous</a>
+                </li>
+
+                <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                <li class="page-item <?= ($page == $i) ? 'active' : '' ?>">
+                    <a class="page-link"
+                        href="?page=<?= $i ?>&tanggal_dari=<?= $_GET['tanggal_dari'] ?? '' ?>&tanggal_sampai=<?= $_GET['tanggal_sampai'] ?? '' ?>"><?= $i ?></a>
+                </li>
+                <?php endfor; ?>
+
+                <li class="page-item <?= ($page >= $total_pages) ? 'disabled' : '' ?>">
+                    <a class="page-link"
+                        href="?page=<?= $page + 1 ?>&tanggal_dari=<?= $_GET['tanggal_dari'] ?? '' ?>&tanggal_sampai=<?= $_GET['tanggal_sampai'] ?? '' ?>">Next</a>
+                </li>
+            </ul>
+        </nav>
 
     </div>
 </div>

@@ -75,28 +75,28 @@ $total_pages = ceil($total_data / $limit);
                     <div class="input-group">
                         <select name="filter_bulan" class="form-control">
                             <option value="">--Pilih Bulan--</option>
-                            <option value="01">Januari</option>
-                            <option value="02">Februari</option>
-                            <option value="03">Maret</option>
-                            <option value="04">April</option>
-                            <option value="05">Mei</option>
-                            <option value="06">Juni</option>
-                            <option value="07">Juli</option>
-                            <option value="08">Agustus</option>
-                            <option value="09">September</option>
-                            <option value="10">Oktober</option>
-                            <option value="11">November</option>
-                            <option value="12">Desember</option>
+                            <option value="01" <?= (isset($_GET['filter_bulan']) && $_GET['filter_bulan'] == '01') ? 'selected' : '' ?>>Januari</option>
+                            <option value="02" <?= (isset($_GET['filter_bulan']) && $_GET['filter_bulan'] == '02') ? 'selected' : '' ?>>Februari</option>
+                            <option value="03" <?= (isset($_GET['filter_bulan']) && $_GET['filter_bulan'] == '03') ? 'selected' : '' ?>>Maret</option>
+                            <option value="04" <?= (isset($_GET['filter_bulan']) && $_GET['filter_bulan'] == '04') ? 'selected' : '' ?>>April</option>
+                            <option value="05" <?= (isset($_GET['filter_bulan']) && $_GET['filter_bulan'] == '05') ? 'selected' : '' ?>>Mei</option>
+                            <option value="06" <?= (isset($_GET['filter_bulan']) && $_GET['filter_bulan'] == '06') ? 'selected' : '' ?>>Juni</option>
+                            <option value="07" <?= (isset($_GET['filter_bulan']) && $_GET['filter_bulan'] == '07') ? 'selected' : '' ?>>Juli</option>
+                            <option value="08" <?= (isset($_GET['filter_bulan']) && $_GET['filter_bulan'] == '08') ? 'selected' : '' ?>>Agustus</option>
+                            <option value="09" <?= (isset($_GET['filter_bulan']) && $_GET['filter_bulan'] == '09') ? 'selected' : '' ?>>September</option>
+                            <option value="10" <?= (isset($_GET['filter_bulan']) && $_GET['filter_bulan'] == '10') ? 'selected' : '' ?>>Oktober</option>
+                            <option value="11" <?= (isset($_GET['filter_bulan']) && $_GET['filter_bulan'] == '11') ? 'selected' : '' ?>>November</option>
+                            <option value="12" <?= (isset($_GET['filter_bulan']) && $_GET['filter_bulan'] == '12') ? 'selected' : '' ?>>Desember</option>
                         </select>
 
                         <select name="filter_tahun" class="form-control">
                             <option value="">--Pilih Tahun--</option>
-                            <option value="2023">2023</option>
-                            <option value="2024">2024</option>
-                            <option value="2025">2025</option>
-                            <option value="2026">2026</option>
-                            <option value="2027">2027</option>
-                            <option value="2027">2028</option>
+                            <option value="2023" <?= (isset($_GET['filter_tahun']) && $_GET['filter_tahun'] == '2023') ? 'selected' : '' ?>>2023</option>
+                            <option value="2024" <?= (isset($_GET['filter_tahun']) && $_GET['filter_tahun'] == '2024') ? 'selected' : '' ?>>2024</option>
+                            <option value="2025" <?= (isset($_GET['filter_tahun']) && $_GET['filter_tahun'] == '2025') ? 'selected' : '' ?>>2025</option>
+                            <option value="2026" <?= (isset($_GET['filter_tahun']) && $_GET['filter_tahun'] == '2026') ? 'selected' : '' ?>>2026</option>
+                            <option value="2027" <?= (isset($_GET['filter_tahun']) && $_GET['filter_tahun'] == '2027') ? 'selected' : '' ?>>2027</option>
+                            <option value="2028" <?= (isset($_GET['filter_tahun']) && $_GET['filter_tahun'] == '2028') ? 'selected' : '' ?>>2028</option>
                         </select>
 
                         <button type="submit" class="btn btn-primary">Tampilkan</button>
@@ -192,17 +192,17 @@ $total_pages = ceil($total_data / $limit);
         <nav aria-label="Page navigation">
             <ul class="pagination justify-content-center mt-8">
                 <li class="page-item <?= ($page <= 1) ? 'disabled' : '' ?>">
-                    <a class="page-link" href="?page=<?= $page - 1 ?>">Previous</a>
+                    <a class="page-link" href="?page=<?= $page - 1 ?>&filter_bulan=<?= $_GET['filter_bulan'] ?? '' ?>&filter_tahun=<?= $_GET['filter_tahun'] ?? '' ?>">Previous</a>
                 </li>
 
                 <?php for ($i = 1; $i <= $total_pages; $i++): ?>
                 <li class="page-item <?= ($page == $i) ? 'active' : '' ?>">
-                    <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
+                    <a class="page-link" href="?page=<?= $i ?>&filter_bulan=<?= $_GET['filter_bulan'] ?? '' ?>&filter_tahun=<?= $_GET['filter_tahun'] ?? '' ?>"><?= $i ?></a>
                 </li>
                 <?php endfor; ?>
 
                 <li class="page-item <?= ($page >= $total_pages) ? 'disabled' : '' ?>">
-                    <a class="page-link" href="?page=<?= $page + 1 ?>">Next</a>
+                    <a class="page-link" href="?page=<?= $page + 1 ?>&filter_bulan=<?= $_GET['filter_bulan'] ?? '' ?>&filter_tahun=<?= $_GET['filter_tahun'] ?? '' ?>">Next</a>
                 </li>
             </ul>
         </nav>

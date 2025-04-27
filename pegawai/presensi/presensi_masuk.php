@@ -167,7 +167,7 @@ var circle = L.circle([latitude_peg, longitude_peg], {
     radius: 500
 }).addTo(map).bindPopup("Lokasi Anda saat ini").openPopup();
 </script>
-<a href="javascript:void(take_snapshot())">Take Snapshot</a>
+<!-- <a href="javascript:void(take_snapshot())">Take Snapshot</a> -->
 
 <?php } ?>
 

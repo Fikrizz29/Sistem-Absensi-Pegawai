@@ -13,10 +13,27 @@ $pegawai = mysqli_query($connection, "SELECT pegawai.*, users.status FROM pegawa
 $total_pegawai_aktif = mysqli_num_rows($pegawai);
 
 
+
 ?>
+
+<style>
+.clock-container {
+    font-size: 14px;
+    font-weight: 400;
+    color: rgba(51, 51, 51, 0.7);
+    font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    border-radius: 10px;
+    width: fit-content;
+    margin-bottom: 20px;
+}
+</style>
+
+
+
 <!-- Page body -->
 <div class="page-body">
     <div class="container-xl">
+        <div id="clock" class="clock-container"></div>
         <div class="row row-deck row-cards">
             <div class="col-12">
                 <div class="row row-cards">
@@ -129,4 +146,25 @@ $total_pegawai_aktif = mysqli_num_rows($pegawai);
         </div> <!-- End row-deck -->
     </div> <!-- End container-xl -->
 </div> <!-- End page-body -->
+<script>
+function updateClock() {
+    const now = new Date();
+    const options = {
+        weekday: 'long',
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric'
+    };
+    const dateString = now.toLocaleDateString('id-ID', options);
+    const timeString = now.toLocaleTimeString('id-ID');
+    document.getElementById('clock').innerHTML = dateString + ' ' + timeString;
+}
+
+// Update setiap 1 detik
+setInterval(updateClock, 1000);
+
+// Panggil pertama kali
+updateClock();
+</script>
+
 <?php include('../layout/footer.php');  ?>

@@ -27,6 +27,7 @@
 <!-- Tabler Core -->
 <script src="<?= base_url('assets/js/tabler.min.js?1692870487') ?>" defer></script>
 <script src="<?= base_url('assets/js/demo.min.js?1692870487') ?>" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <!-- sweetalert -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 

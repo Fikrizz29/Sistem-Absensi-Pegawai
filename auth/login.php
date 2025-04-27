@@ -150,6 +150,21 @@ if (isset($_POST["login"])){
                 </div>
             </div>
         </div>
+
+        <!-- Showpw -->
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const togglePassword = document.querySelector('.link-secondary');
+            const passwordInput = document.querySelector('input[name="password"]');
+
+            togglePassword.addEventListener('click', function(e) {
+                e.preventDefault();
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+            });
+        });
+        </script>
+
         <!-- Libs JS -->
         <script src="<?= base_url('assets/libs/apexcharts/dist/apexcharts.min.js?1692870487') ?>" defer></script>
         <script src="<?= base_url('assets/libs/jsvectormap/dist/js/jsvectormap.min.js?1692870487') ?>" defer></script>

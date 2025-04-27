@@ -12,7 +12,7 @@ include('../layout/header.php');
 include_once('../../config.php');
 
 $limit = 10; // Jumlah data per halaman
-$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
 
 if (empty($_GET['tanggal_dari'])) {
@@ -49,10 +49,10 @@ $total_pages = ceil($total_data / $limit);
         <!-- Navigasi berdasarkan Role -->
         <div class="alert alert-info">
             <strong>Anda login sebagai:</strong>
-            <?php if ($_SESSION["role"] == 'admin') : ?>
+            <?php if ($_SESSION["role"] == 'admin'): ?>
             <span class="badge bg-success text-white">Administrator</span>
             <p class="mt-2">Anda memiliki akses penuh untuk melihat data rekap presensi harian dari setiap pegawai</p>
-            <?php else : ?>
+            <?php else: ?>
             <span class="badge bg-warning">Pegawai</span>
             <p class="mt-2">Anda hanya dapat melihat data pegawai tanpa bisa mengedit atau menghapusnya.</p>
             <?php endif; ?>
@@ -79,7 +79,7 @@ $total_pages = ceil($total_data / $limit);
             </div>
         </div>
 
-        <?php if (empty($_GET['tanggal_dari'])) : ?>
+        <?php if (empty($_GET['tanggal_dari'])): ?>
         <span>Rekap Presensi Tanggal: <?= date('d F Y') ?></span>
         <?php else: ?>
         <span>Rekap Presensi Tanggal:
@@ -98,35 +98,35 @@ $total_pages = ceil($total_data / $limit);
                 <th>Total Terlambat</th>
             </tr>
 
-            <?php if(mysqli_num_rows($result) === 0) { ?>
+            <?php if (mysqli_num_rows($result) === 0) { ?>
             <tr>
                 <td colspan="7">Data rekap presensi masih kosong.</td>
             </tr>
             <?php } else { ?>
 
             <?php $no = $offset + 1;
-            while ($rekap = mysqli_fetch_array($result)):
+                while ($rekap = mysqli_fetch_array($result)):
 
-                // Menghitung total jam kerja
-                $jam_tanggal_masuk = strtotime($rekap['tanggal_masuk'] . ' ' . $rekap['jam_masuk']);
-                $jam_tanggal_keluar = strtotime($rekap['tanggal_keluar'] . ' ' . $rekap['jam_keluar']);
+                    // Menghitung total jam kerja
+                    $jam_tanggal_masuk = strtotime($rekap['tanggal_masuk'] . ' ' . $rekap['jam_masuk']);
+                    $jam_tanggal_keluar = strtotime($rekap['tanggal_keluar'] . ' ' . $rekap['jam_keluar']);
 
-                $selisih = $jam_tanggal_keluar - $jam_tanggal_masuk;
-                $total_jam_kerja = floor($selisih / 3600);
-                $selisih_menit_kerja = floor(($selisih % 3600) / 60);
+                    $selisih = $jam_tanggal_keluar - $jam_tanggal_masuk;
+                    $total_jam_kerja = floor($selisih / 3600);
+                    $selisih_menit_kerja = floor(($selisih % 3600) / 60);
 
-                // Menghitung total jam terlambat
-                $lokasi_presensi = $rekap['lokasi_presensi'];
-                $lokasi_query = mysqli_query($connection, "SELECT jam_masuk FROM lokasi_presensi WHERE nama_lokasi = '$lokasi_presensi'");
-                $jam_masuk_kantor = mysqli_fetch_assoc($lokasi_query)['jam_masuk'];
+                    // Menghitung total jam terlambat
+                    $lokasi_presensi = $rekap['lokasi_presensi'];
+                    $lokasi_query = mysqli_query($connection, "SELECT jam_masuk FROM lokasi_presensi WHERE nama_lokasi = '$lokasi_presensi'");
+                    $jam_masuk_kantor = mysqli_fetch_assoc($lokasi_query)['jam_masuk'];
 
-                $jam_masuk = strtotime($rekap['jam_masuk']);
-                $jam_masuk_kantor = strtotime($jam_masuk_kantor);
+                    $jam_masuk = strtotime($rekap['jam_masuk']);
+                    $jam_masuk_kantor = strtotime($jam_masuk_kantor);
 
-                $terlambat = $jam_masuk - $jam_masuk_kantor;
-                $total_jam_terlambat = floor($terlambat / 3600);
-                $selisih_menit_terlambat = floor(($terlambat % 3600) / 60);
-            ?>
+                    $terlambat = $jam_masuk - $jam_masuk_kantor;
+                    $total_jam_terlambat = floor($terlambat / 3600);
+                    $selisih_menit_terlambat = floor(($terlambat % 3600) / 60);
+                    ?>
 
             <tr>
                 <td><?= $no++ ?></td>
@@ -150,20 +150,24 @@ $total_pages = ceil($total_data / $limit);
         <nav aria-label="Page navigation">
             <ul class="pagination justify-content-center">
                 <li class="page-item <?= ($page <= 1) ? 'disabled' : '' ?>">
-                    <a class="page-link" href="?page=<?= $page - 1 ?>">Previous</a>
+                    <a class="page-link"
+                        href="?page=<?= $page - 1 ?>&tanggal_dari=<?= $_GET['tanggal_dari'] ?? '' ?>&tanggal_sampai=<?= $_GET['tanggal_sampai'] ?? '' ?>">Previous</a>
                 </li>
 
                 <?php for ($i = 1; $i <= $total_pages; $i++): ?>
                 <li class="page-item <?= ($page == $i) ? 'active' : '' ?>">
-                    <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
+                    <a class="page-link"
+                        href="?page=<?= $i ?>&tanggal_dari=<?= $_GET['tanggal_dari'] ?? '' ?>&tanggal_sampai=<?= $_GET['tanggal_sampai'] ?? '' ?>"><?= $i ?></a>
                 </li>
                 <?php endfor; ?>
 
                 <li class="page-item <?= ($page >= $total_pages) ? 'disabled' : '' ?>">
-                    <a class="page-link" href="?page=<?= $page + 1 ?>">Next</a>
+                    <a class="page-link"
+                        href="?page=<?= $page + 1 ?>&tanggal_dari=<?= $_GET['tanggal_dari'] ?? '' ?>&tanggal_sampai=<?= $_GET['tanggal_sampai'] ?? '' ?>">Next</a>
                 </li>
             </ul>
         </nav>
+
 
     </div>
 </div>
