@@ -11,6 +11,8 @@ $judul = 'Rekap Presensi Bulanan';
 include('../layout/header.php');
 include_once('../../config.php');
 
+$base_url = "http://" . $_SERVER['HTTP_HOST'] . "/presensi";
+
 $limit = 10; // Jumlah data per halaman
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
@@ -20,7 +22,7 @@ $bulan = empty($_GET['filter_bulan']) ? date('Y-m') : $_GET['filter_tahun'] . '-
 
 // Query data dengan pagination
 $query_data = "
-    SELECT presensi.*, pegawai.nama, pegawai.lokasi_presensi 
+    SELECT presensi.*, pegawai.nama, pegawai.lokasi_presensi, presensi.foto_masuk, presensi.foto_keluar  
     FROM presensi 
     JOIN pegawai ON presensi.id_pegawai = pegawai.id 
     WHERE DATE_FORMAT(tanggal_masuk, '%Y-%m') = '$bulan' 
@@ -75,28 +77,64 @@ $total_pages = ceil($total_data / $limit);
                     <div class="input-group">
                         <select name="filter_bulan" class="form-control">
                             <option value="">--Pilih Bulan--</option>
-                            <option value="01" <?= (isset($_GET['filter_bulan']) && $_GET['filter_bulan'] == '01') ? 'selected' : '' ?>>Januari</option>
-                            <option value="02" <?= (isset($_GET['filter_bulan']) && $_GET['filter_bulan'] == '02') ? 'selected' : '' ?>>Februari</option>
-                            <option value="03" <?= (isset($_GET['filter_bulan']) && $_GET['filter_bulan'] == '03') ? 'selected' : '' ?>>Maret</option>
-                            <option value="04" <?= (isset($_GET['filter_bulan']) && $_GET['filter_bulan'] == '04') ? 'selected' : '' ?>>April</option>
-                            <option value="05" <?= (isset($_GET['filter_bulan']) && $_GET['filter_bulan'] == '05') ? 'selected' : '' ?>>Mei</option>
-                            <option value="06" <?= (isset($_GET['filter_bulan']) && $_GET['filter_bulan'] == '06') ? 'selected' : '' ?>>Juni</option>
-                            <option value="07" <?= (isset($_GET['filter_bulan']) && $_GET['filter_bulan'] == '07') ? 'selected' : '' ?>>Juli</option>
-                            <option value="08" <?= (isset($_GET['filter_bulan']) && $_GET['filter_bulan'] == '08') ? 'selected' : '' ?>>Agustus</option>
-                            <option value="09" <?= (isset($_GET['filter_bulan']) && $_GET['filter_bulan'] == '09') ? 'selected' : '' ?>>September</option>
-                            <option value="10" <?= (isset($_GET['filter_bulan']) && $_GET['filter_bulan'] == '10') ? 'selected' : '' ?>>Oktober</option>
-                            <option value="11" <?= (isset($_GET['filter_bulan']) && $_GET['filter_bulan'] == '11') ? 'selected' : '' ?>>November</option>
-                            <option value="12" <?= (isset($_GET['filter_bulan']) && $_GET['filter_bulan'] == '12') ? 'selected' : '' ?>>Desember</option>
+                            <option value="01"
+                                <?= (isset($_GET['filter_bulan']) && $_GET['filter_bulan'] == '01') ? 'selected' : '' ?>>
+                                Januari</option>
+                            <option value="02"
+                                <?= (isset($_GET['filter_bulan']) && $_GET['filter_bulan'] == '02') ? 'selected' : '' ?>>
+                                Februari</option>
+                            <option value="03"
+                                <?= (isset($_GET['filter_bulan']) && $_GET['filter_bulan'] == '03') ? 'selected' : '' ?>>
+                                Maret</option>
+                            <option value="04"
+                                <?= (isset($_GET['filter_bulan']) && $_GET['filter_bulan'] == '04') ? 'selected' : '' ?>>
+                                April</option>
+                            <option value="05"
+                                <?= (isset($_GET['filter_bulan']) && $_GET['filter_bulan'] == '05') ? 'selected' : '' ?>>
+                                Mei</option>
+                            <option value="06"
+                                <?= (isset($_GET['filter_bulan']) && $_GET['filter_bulan'] == '06') ? 'selected' : '' ?>>
+                                Juni</option>
+                            <option value="07"
+                                <?= (isset($_GET['filter_bulan']) && $_GET['filter_bulan'] == '07') ? 'selected' : '' ?>>
+                                Juli</option>
+                            <option value="08"
+                                <?= (isset($_GET['filter_bulan']) && $_GET['filter_bulan'] == '08') ? 'selected' : '' ?>>
+                                Agustus</option>
+                            <option value="09"
+                                <?= (isset($_GET['filter_bulan']) && $_GET['filter_bulan'] == '09') ? 'selected' : '' ?>>
+                                September</option>
+                            <option value="10"
+                                <?= (isset($_GET['filter_bulan']) && $_GET['filter_bulan'] == '10') ? 'selected' : '' ?>>
+                                Oktober</option>
+                            <option value="11"
+                                <?= (isset($_GET['filter_bulan']) && $_GET['filter_bulan'] == '11') ? 'selected' : '' ?>>
+                                November</option>
+                            <option value="12"
+                                <?= (isset($_GET['filter_bulan']) && $_GET['filter_bulan'] == '12') ? 'selected' : '' ?>>
+                                Desember</option>
                         </select>
 
                         <select name="filter_tahun" class="form-control">
                             <option value="">--Pilih Tahun--</option>
-                            <option value="2023" <?= (isset($_GET['filter_tahun']) && $_GET['filter_tahun'] == '2023') ? 'selected' : '' ?>>2023</option>
-                            <option value="2024" <?= (isset($_GET['filter_tahun']) && $_GET['filter_tahun'] == '2024') ? 'selected' : '' ?>>2024</option>
-                            <option value="2025" <?= (isset($_GET['filter_tahun']) && $_GET['filter_tahun'] == '2025') ? 'selected' : '' ?>>2025</option>
-                            <option value="2026" <?= (isset($_GET['filter_tahun']) && $_GET['filter_tahun'] == '2026') ? 'selected' : '' ?>>2026</option>
-                            <option value="2027" <?= (isset($_GET['filter_tahun']) && $_GET['filter_tahun'] == '2027') ? 'selected' : '' ?>>2027</option>
-                            <option value="2028" <?= (isset($_GET['filter_tahun']) && $_GET['filter_tahun'] == '2028') ? 'selected' : '' ?>>2028</option>
+                            <option value="2023"
+                                <?= (isset($_GET['filter_tahun']) && $_GET['filter_tahun'] == '2023') ? 'selected' : '' ?>>
+                                2023</option>
+                            <option value="2024"
+                                <?= (isset($_GET['filter_tahun']) && $_GET['filter_tahun'] == '2024') ? 'selected' : '' ?>>
+                                2024</option>
+                            <option value="2025"
+                                <?= (isset($_GET['filter_tahun']) && $_GET['filter_tahun'] == '2025') ? 'selected' : '' ?>>
+                                2025</option>
+                            <option value="2026"
+                                <?= (isset($_GET['filter_tahun']) && $_GET['filter_tahun'] == '2026') ? 'selected' : '' ?>>
+                                2026</option>
+                            <option value="2027"
+                                <?= (isset($_GET['filter_tahun']) && $_GET['filter_tahun'] == '2027') ? 'selected' : '' ?>>
+                                2027</option>
+                            <option value="2028"
+                                <?= (isset($_GET['filter_tahun']) && $_GET['filter_tahun'] == '2028') ? 'selected' : '' ?>>
+                                2028</option>
                         </select>
 
                         <button type="submit" class="btn btn-primary">Tampilkan</button>
@@ -116,6 +154,7 @@ $total_pages = ceil($total_data / $limit);
                 <th>Jam Pulang</th>
                 <th>Total Jam</th>
                 <th>Total Terlambat</th>
+                <th colspan="2">Bukti Kehadiran</th>
             </tr>
 
             <?php if(mysqli_num_rows($result) === 0) {?>
@@ -181,8 +220,30 @@ $total_pages = ceil($total_data / $limit);
                     <?php else: ?>
                     <?= $total_jam_terlambat . ' Jam ' . $selisih_menit_terlambat . ' Menit' ?>
                     <?php endif; ?>
-
                 </td>
+
+                <td class="text-center">
+                    <?php if (!empty($rekap['foto_masuk'])): ?>
+                    <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#fotoModal"
+                        data-foto="<?= base_url('pegawai/presensi/foto/' . $rekap['foto_masuk']) ?>" data-jenis="masuk">
+                        Lihat Foto Masuk
+                    </a>
+                    <?php else: ?>
+                    <span class="text-muted">Tidak ada foto</span>
+                    <?php endif; ?>
+                </td>
+                <td class="text-center">
+                    <?php if (!empty($rekap['foto_keluar'])): ?>
+                    <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#fotoModal"
+                        data-foto="<?= base_url('pegawai/presensi/foto/' . $rekap['foto_keluar']) ?>"
+                        data-jenis="keluar">
+                        Lihat Foto Keluar
+                    </a>
+                    <?php else: ?>
+                    <span class="text-muted">Tidak ada foto</span>
+                    <?php endif; ?>
+                </td>
+
             </tr>
             <?php endwhile; ?>
             <?php } ?>
@@ -192,20 +253,38 @@ $total_pages = ceil($total_data / $limit);
         <nav aria-label="Page navigation">
             <ul class="pagination justify-content-center mt-8">
                 <li class="page-item <?= ($page <= 1) ? 'disabled' : '' ?>">
-                    <a class="page-link" href="?page=<?= $page - 1 ?>&filter_bulan=<?= $_GET['filter_bulan'] ?? '' ?>&filter_tahun=<?= $_GET['filter_tahun'] ?? '' ?>">Previous</a>
+                    <a class="page-link"
+                        href="?page=<?= $page - 1 ?>&filter_bulan=<?= $_GET['filter_bulan'] ?? '' ?>&filter_tahun=<?= $_GET['filter_tahun'] ?? '' ?>">Previous</a>
                 </li>
 
                 <?php for ($i = 1; $i <= $total_pages; $i++): ?>
                 <li class="page-item <?= ($page == $i) ? 'active' : '' ?>">
-                    <a class="page-link" href="?page=<?= $i ?>&filter_bulan=<?= $_GET['filter_bulan'] ?? '' ?>&filter_tahun=<?= $_GET['filter_tahun'] ?? '' ?>"><?= $i ?></a>
+                    <a class="page-link"
+                        href="?page=<?= $i ?>&filter_bulan=<?= $_GET['filter_bulan'] ?? '' ?>&filter_tahun=<?= $_GET['filter_tahun'] ?? '' ?>"><?= $i ?></a>
                 </li>
                 <?php endfor; ?>
 
                 <li class="page-item <?= ($page >= $total_pages) ? 'disabled' : '' ?>">
-                    <a class="page-link" href="?page=<?= $page + 1 ?>&filter_bulan=<?= $_GET['filter_bulan'] ?? '' ?>&filter_tahun=<?= $_GET['filter_tahun'] ?? '' ?>">Next</a>
+                    <a class="page-link"
+                        href="?page=<?= $page + 1 ?>&filter_bulan=<?= $_GET['filter_bulan'] ?? '' ?>&filter_tahun=<?= $_GET['filter_tahun'] ?? '' ?>">Next</a>
                 </li>
             </ul>
         </nav>
+
+        <!-- Kode Modal untuk Lihat Foto -->
+        <div class="modal fade" id="fotoModal" tabindex="-1" aria-labelledby="fotoModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="fotoModalLabel">Lihat Foto</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <img src="" id="fotoView" class="img-fluid" alt="Foto" />
+                    </div>
+                </div>
+            </div>
+        </div>
 
     </div>
 </div>
@@ -217,7 +296,7 @@ $total_pages = ceil($total_data / $limit);
                 <h5 class="modal-title">Export Excel Recap Presensi Bulanan</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form method="POST" action="<?= base_url('admin/presensi/rekap_bulanan_excel.php') ?>">
+            <form id="exportForm" method="POST" action="<?= base_url('admin/presensi/rekap_bulanan_excel.php') ?>">
                 <div class="modal-body">
 
                     <div class="mb-3">

@@ -10,6 +10,7 @@ require_once('../../config.php') ?>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>ElevenTwelfth</title>
+    <link rel="icon" type="image/png" href="<?= base_url('assets/img/logo-small.png') ?>" />
     <!-- CSS files -->
     <link href="<?= base_url('assets/css/tabler.min.css?1692870487') ?>" rel="stylesheet" />
     <link href="<?= base_url('assets/css/tabler-vendors.min.css?1692870487') ?>" rel="stylesheet" />
@@ -19,6 +20,8 @@ require_once('../../config.php') ?>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
         integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-o9N1j8RE6fD3v2QK5z5k7f5p9e9e9e9e9e9e9e9e9=" crossorigin="" />
 
     <style>
     @import url('https://rsms.me/inter/inter.css');
@@ -375,7 +378,8 @@ require_once('../../config.php') ?>
                 </div>
             </div>
 
-            <!--  -->
+
+            <!-- -->
             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 </body>

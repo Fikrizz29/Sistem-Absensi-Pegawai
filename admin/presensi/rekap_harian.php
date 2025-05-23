@@ -11,6 +11,8 @@ $judul = 'Rekap Presensi Harian';
 include('../layout/header.php');
 include_once('../../config.php');
 
+$base_url = "http://" . $_SERVER['HTTP_HOST'] . "/presensi";
+
 $limit = 10; // Jumlah data per halaman
 $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
@@ -18,7 +20,7 @@ $offset = ($page - 1) * $limit;
 if (empty($_GET['tanggal_dari'])) {
     $tanggal_hari_ini = date('Y-m-d');
     $query_count = "SELECT COUNT(*) as total FROM presensi WHERE tanggal_masuk = '$tanggal_hari_ini'";
-    $query_data = "SELECT presensi.*, pegawai.nama, pegawai.lokasi_presensi 
+    $query_data = "SELECT presensi.*, pegawai.nama, pegawai.lokasi_presensi, presensi.foto_masuk, presensi.foto_keluar 
                    FROM presensi 
                    JOIN pegawai ON presensi.id_pegawai = pegawai.id 
                    WHERE tanggal_masuk = '$tanggal_hari_ini' 
@@ -28,7 +30,7 @@ if (empty($_GET['tanggal_dari'])) {
     $tanggal_dari = $_GET['tanggal_dari'];
     $tanggal_sampai = $_GET['tanggal_sampai'];
     $query_count = "SELECT COUNT(*) as total FROM presensi WHERE tanggal_masuk BETWEEN '$tanggal_dari' AND '$tanggal_sampai'";
-    $query_data = "SELECT presensi.*, pegawai.nama, pegawai.lokasi_presensi 
+    $query_data = "SELECT presensi.*, pegawai.nama, pegawai.lokasi_presensi, presensi.foto_masuk, presensi.foto_keluar 
                    FROM presensi 
                    JOIN pegawai ON presensi.id_pegawai = pegawai.id 
                    WHERE tanggal_masuk BETWEEN '$tanggal_dari' AND '$tanggal_sampai' 
@@ -96,6 +98,7 @@ $total_pages = ceil($total_data / $limit);
                 <th>Jam Pulang</th>
                 <th>Total Jam</th>
                 <th>Total Terlambat</th>
+                <th colspan="2">Bukti Kehadiran</th>
             </tr>
 
             <?php if (mysqli_num_rows($result) === 0) { ?>
@@ -140,6 +143,30 @@ $total_pages = ceil($total_data / $limit);
                 <td class="text-center">
                     <?= ($total_jam_terlambat < 0) ? '<span class="badge bg-success text-white">On Time</span>' : $total_jam_terlambat . ' Jam ' . $selisih_menit_terlambat . ' Menit' ?>
                 </td>
+
+                <td class="text-center">
+                    <?php if (!empty($rekap['foto_masuk'])): ?>
+                    <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#fotoModal"
+                        data-foto="<?= base_url('pegawai/presensi/foto/' . $rekap['foto_masuk']) ?>" data-jenis="masuk">
+                        Lihat Foto Masuk
+                    </a>
+                    <?php else: ?>
+                    <span class="text-muted">Tidak ada foto</span>
+                    <?php endif; ?>
+                </td>
+                <td class="text-center">
+                    <?php if (!empty($rekap['foto_keluar'])): ?>
+                    <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#fotoModal"
+                        data-foto="<?= base_url('pegawai/presensi/foto/' . $rekap['foto_keluar']) ?>"
+                        data-jenis="keluar">
+                        Lihat Foto Keluar
+                    </a>
+                    <?php else: ?>
+                    <span class="text-muted">Tidak ada foto</span>
+                    <?php endif; ?>
+                </td>
+
+
             </tr>
             <?php endwhile; ?>
             <?php } ?>
@@ -168,6 +195,20 @@ $total_pages = ceil($total_data / $limit);
             </ul>
         </nav>
 
+        <!-- Kode Modal untuk Lihat Foto -->
+        <div class="modal fade" id="fotoModal" tabindex="-1" aria-labelledby="fotoModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="fotoModalLabel">Lihat Foto</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <img src="" id="fotoView" class="img-fluid" alt="Foto" />
+                    </div>
+                </div>
+            </div>
+        </div>
 
     </div>
 </div>
@@ -179,7 +220,7 @@ $total_pages = ceil($total_data / $limit);
                 <h5 class="modal-title">Export Excel Recap Presensi Harian</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form method="POST" action="<?= base_url('admin/presensi/rekap_harian_excel.php') ?>">
+            <form id="exportForm" method="POST" action="<?= base_url('admin/presensi/rekap_harian_excel.php') ?>">
                 <div class="modal-body">
 
                     <div class="mb-3">

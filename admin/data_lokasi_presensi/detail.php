@@ -1,3 +1,11 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/webcamjs/1.0.26/webcam.min.js"
+    integrity="sha512-dQIiHSl2hr3NWKKLycPndtpbh5iaHLo6MwrXm7F0FM5e+kL2U16oE9uIwPHUl6fQBeCthiEuV/rzP3MiAB8Vfw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
 <?php 
 session_start();
 
@@ -13,9 +21,11 @@ require_once('../../config.php');
 
 $id = $_GET['id'];
 $result = mysqli_query($connection, "SELECT * FROM lokasi_presensi WHERE id=$id");
-?>
 
-<?php while($lokasi = mysqli_fetch_array($result)) : ?>
+$lokasi = mysqli_fetch_assoc($result);
+$latitude_kantor = floatval($lokasi['latitude']);
+$longitude_kantor = floatval($lokasi['longitude']);
+?>
 
 <div class="page-body">
     <div class="container-xl">
@@ -46,7 +56,7 @@ $result = mysqli_query($connection, "SELECT * FROM lokasi_presensi WHERE id=$id"
                                 <td>: <?= $lokasi['longitude'] ?></td>
                             </tr>
                             <tr>
-                                <td>Radius</td>
+                                <td>Radius (Meter)</td>
                                 <td>: <?= $lokasi['radius'] ?></td>
                             </tr>
                             <tr>
@@ -68,10 +78,7 @@ $result = mysqli_query($connection, "SELECT * FROM lokasi_presensi WHERE id=$id"
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-body">
-                        <iframe
-                            src="https://www.google.com/maps/embed?pb=!1m16!1m12!1m3!1d833.2158863754775!2d<?= $lokasi['longitude'] ?>!3d<?= $lokasi['latitude'] ?>!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!2m1!1sSekolah%20Vokasi%20IPB%20!5e0!3m2!1sen!2sid!4v1737811650602!5m2!1sen!2sid"
-                            width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy"
-                            referrerpolicy="no-referrer-when-downgrade"></iframe>
+                        <div id="map" style="width: 100%; height: 405px;"></div>
                     </div>
                 </div>
             </div>
@@ -80,6 +87,21 @@ $result = mysqli_query($connection, "SELECT * FROM lokasi_presensi WHERE id=$id"
     </div>
 </div>
 
-<?php endwhile; ?>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // map leaflet js
+    let latitude_ktr = <?= $latitude_kantor ?>;
+    let longitude_ktr = <?= $longitude_kantor ?>;
+
+    let map = L.map('map').setView([latitude_ktr, longitude_ktr], 13);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    var marker = L.marker([latitude_ktr, longitude_ktr]).addTo(map)
+        .bindPopup("Lokasi Kantor").openPopup();
+});
+</script>
 
 <?php include('../layout/footer.php');  ?>

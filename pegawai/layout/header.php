@@ -13,6 +13,7 @@ require_once('../../config.php')
     <title>
         <?= $judul ?>
     </title>
+    <link rel="icon" type="image/png" href="<?= base_url('assets/img/logo-small.png') ?>" />
     <!-- CSS files -->
     <link href="<?= base_url('assets/css/tabler.min.css?1692870487') ?>" rel="stylesheet" />
     <link href="<?= base_url('assets/css/tabler-vendors.min.css?1692870487') ?>" rel="stylesheet" />
@@ -305,3 +306,7 @@ require_once('../../config.php')
                     </div>
                 </div>
             </div>
+
+</body>
+
+</html>

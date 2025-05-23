@@ -42,7 +42,7 @@ $result = mysqli_query($connection, "SELECT * FROM lokasi_presensi ORDER BY id D
                     <th>Nama Lokasi</th>
                     <th>Tipe Lokasi</th>
                     <th>Latitude/Longitude</th>
-                    <th>Radius</th>
+                    <th>Radius (Meter)</th>
                     <th>Aksi</th>
                 </tr>
 

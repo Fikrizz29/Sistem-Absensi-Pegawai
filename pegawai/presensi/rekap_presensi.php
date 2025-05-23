@@ -11,9 +11,13 @@ $judul = 'Rekap Presensi';
 include('../layout/header.php');
 include_once('../../config.php');
 
+$base_url = "http://" . $_SERVER['HTTP_HOST'] . "/presensi";
+
 $id = $_SESSION['id'];
+$tanggal_hari_ini = date('Y-m-d'); // simpan tanggal hari ini sekali saja
+
 if (empty($_GET['tanggal_dari'])) {
-    $query_count = "SELECT COUNT(*) as total FROM presensi WHERE id_pegawai = '$id'";
+    $query_count = "SELECT COUNT(*) as total FROM presensi WHERE id_pegawai = '$id' AND tanggal_masuk = '$tanggal_hari_ini'";
 } else {
     $tanggal_dari = $_GET['tanggal_dari'];
     $tanggal_sampai = $_GET['tanggal_sampai'];
@@ -23,27 +27,26 @@ if (empty($_GET['tanggal_dari'])) {
 $count_result = mysqli_query($connection, $query_count);
 $total_data = mysqli_fetch_assoc($count_result)['total'];
 
-// Tentukan jumlah data per halaman
-$limit = 10; // Jumlah data per halaman
+$limit = 10;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
 
-// Hitung total halaman
 $total_pages = ceil($total_data / $limit);
 
-// Perbarui query untuk data presensi dengan limit dan offset
 if (empty($_GET['tanggal_dari'])) {
-    $result = mysqli_query($connection, "SELECT * FROM presensi WHERE id_pegawai = '$id' ORDER BY tanggal_masuk DESC LIMIT $limit OFFSET $offset");
+    $result = mysqli_query($connection, "SELECT * FROM presensi WHERE id_pegawai = '$id' AND tanggal_masuk = '$tanggal_hari_ini' ORDER BY tanggal_masuk DESC LIMIT $limit OFFSET $offset");
 } else {
     $result = mysqli_query($connection, "SELECT * FROM presensi WHERE id_pegawai = '$id' AND tanggal_masuk BETWEEN '$tanggal_dari' AND '$tanggal_sampai' ORDER BY tanggal_masuk DESC LIMIT $limit OFFSET $offset");
 }
 
+// lokasi presensi
 $lokasi_presensi = $_SESSION['lokasi_presensi'];
 $lokasi = mysqli_query($connection, "SELECT * FROM lokasi_presensi WHERE nama_lokasi = '$lokasi_presensi'");
 
 while ($lokasi_result = mysqli_fetch_array($lokasi)) :
     $jam_masuk_kantor = date('H:i:s',strtotime($lokasi_result['jam_masuk']));
 endwhile;
+
 
 ?>
 
@@ -71,6 +74,14 @@ endwhile;
             </div>
         </div>
 
+        <?php if (empty($_GET['tanggal_dari'])): ?>
+        <span>Rekap Presensi Tanggal: <?= date('d F Y') ?></span>
+        <?php else: ?>
+        <span>Rekap Presensi Tanggal:
+            <?= date('d F Y', strtotime($_GET['tanggal_dari'])) . ' sampai ' . date('d F Y', strtotime($_GET['tanggal_sampai'])) ?>
+        </span>
+        <?php endif; ?>
+
         <table class="table table-bordered">
             <tr class="text-center">
                 <th>No.</th>
@@ -79,6 +90,7 @@ endwhile;
                 <th>Jam Pulang</th>
                 <th>Total Jam</th>
                 <th>Total Terlambat</th>
+                <th colspan="2">Bukti Kehadiran</th>
             </tr>
 
             <?php if(mysqli_num_rows($result) === 0) {?>
@@ -135,8 +147,30 @@ endwhile;
                     <?php else: ?>
                     <?= $total_jam_terlambat . ' Jam ' . $selisih_menit_terlambat . ' Menit' ?>
                     <?php endif; ?>
-
                 </td>
+
+                <td class="text-center">
+                    <?php if (!empty($rekap['foto_masuk'])): ?>
+                    <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#fotoModal"
+                        data-foto="<?= base_url('pegawai/presensi/foto/' . $rekap['foto_masuk']) ?>" data-jenis="masuk">
+                        Lihat Foto Masuk
+                    </a>
+                    <?php else: ?>
+                    <span class="text-muted">Tidak ada foto</span>
+                    <?php endif; ?>
+                </td>
+                <td class="text-center">
+                    <?php if (!empty($rekap['foto_keluar'])): ?>
+                    <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#fotoModal"
+                        data-foto="<?= base_url('pegawai/presensi/foto/' . $rekap['foto_keluar']) ?>"
+                        data-jenis="keluar">
+                        Lihat Foto Keluar
+                    </a>
+                    <?php else: ?>
+                    <span class="text-muted">Tidak ada foto</span>
+                    <?php endif; ?>
+                </td>
+
             </tr>
             <?php endwhile; ?>
             <?php } ?>
@@ -164,6 +198,21 @@ endwhile;
             </ul>
         </nav>
 
+        <!-- Kode Modal untuk Lihat Foto -->
+        <div class="modal fade" id="fotoModal" tabindex="-1" aria-labelledby="fotoModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="fotoModalLabel">Lihat Foto</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <img src="" id="fotoView" class="img-fluid" alt="Foto" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 
@@ -174,25 +223,24 @@ endwhile;
                 <h5 class="modal-title">Export Excel Recap Presensi</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form method="POST" action="<?= base_url('pegawai/presensi/rekap_excel.php') ?>">
+            <form id="exportForm" method="POST" action="<?= base_url('pegawai/presensi/rekap_excel.php') ?>">
                 <div class="modal-body">
-
                     <div class="mb-3">
                         <label for="">Tanggal Awal</label>
-                        <input type="date" class="form-control" name="tanggal_dari">
+                        <input type="date" class="form-control" name="tanggal_dari" required>
                     </div>
 
                     <div class="mb-3">
                         <label for="">Tanggal Akhir</label>
-                        <input type="date" class="form-control" name="tanggal_sampai">
+                        <input type="date" class="form-control" name="tanggal_sampai" required>
                     </div>
-
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn me-auto" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Export</button>
+                    <button type="submit" class="btn btn-primary">Export</button>
                 </div>
             </form>
+
         </div>
     </div>
 </div>

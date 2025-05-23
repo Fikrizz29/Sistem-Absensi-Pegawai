@@ -3,55 +3,55 @@ session_start();
 
 require_once('../config.php'); 
 
-if (isset($_POST["login"])){
-     $username = $_POST["username"];
-     $password = $_POST["password"];
+if (isset($_POST["login"])) {
+    $username = trim($_POST["username"]);
+    $password = trim($_POST["password"]);
 
-    $result = mysqli_query($connection, "SELECT * FROM users JOIN pegawai ON users.id_pegawai = pegawai.id WHERE username = '$username'");
+    if (empty($username) && empty($password)) {
+        $_SESSION["gagal"] = "Username dan Password wajib diisi.";
+    } elseif (empty($username)) {
+        $_SESSION["gagal"] = "Username wajib diisi.";
+    } elseif (empty($password)) {
+        $_SESSION["gagal"] = "Password wajib diisi.";
+    } else {
+        // Lanjutkan proses login jika validasi berhasil
+        $result = mysqli_query($connection, "SELECT * FROM users JOIN pegawai ON users.id_pegawai = pegawai.id WHERE username = '$username'");
 
-    if(mysqli_num_rows($result) === 1) {
-        $row = mysqli_fetch_assoc($result);
+        if (mysqli_num_rows($result) === 1) {
+            $row = mysqli_fetch_assoc($result);
 
-        if(password_verify($password, $row['password'])) {
-            if($row['status'] == 'Aktif') {
+            if (password_verify($password, $row['password'])) {
+                if ($row['status'] == 'Aktif') {
+                    $_SESSION["login"] = true;
+                    $_SESSION['id'] = $row['id'];
+                    $_SESSION['role'] = $row['role'];
+                    $_SESSION['nama'] = $row['nama'];
+                    $_SESSION['nip'] = $row['nip'];
+                    $_SESSION['jabatan'] = $row['jabatan'];
+                    $_SESSION['lokasi_presensi'] = $row['lokasi_presensi'];
 
-                $_SESSION["login"] = true;
-                $_SESSION['id'] =  $row['id'];
-                $_SESSION['role'] =  $row['role'];
-                $_SESSION['nama'] =  $row['nama'];
-                $_SESSION['nip'] =  $row['nip'];
-                $_SESSION['jabatan'] =  $row['jabatan'];
-                $_SESSION['lokasi_presensi'] =  $row['lokasi_presensi'];
-
-                if($row['role'] === 'admin'){
-                    header("Location: ../admin/home/home.php");
-                    exit();
-                }else{
-                    header("Location: ../pegawai/home/home.php");
-                    exit();
+                    if ($row['role'] === 'admin') {
+                        header("Location: ../admin/home/home.php");
+                        exit();
+                    } else {
+                        header("Location: ../pegawai/home/home.php");
+                        exit();
+                    }
+                } else {
+                    $_SESSION["gagal"] = "Akun Anda belum aktif";
                 }
-            }else{
-                $_SESSION["gagal"] = "Akun Anda belum aktif";
+            } else {
+                $_SESSION["gagal"] = "Password salah, silahkan coba lagi";
             }
-        }else{
-            $_SESSION["gagal"] = "Password salah, silahkan coba lagi";
+        } else {
+            $_SESSION["gagal"] = "Username salah, silahkan coba lagi";
         }
-    }else{
-        $_SESSION["gagal"] = "Username salah, silahkan coba lagi";
     }
 }
 
 ?>
 
 <!doctype html>
-<!--
-* Tabler - Premium and Open Source dashboard template with responsive and high quality UI.
-* @version 1.0.0-beta20
-* @link https://tabler.io
-* Copyright 2018-2023 The Tabler Authors
-* Copyright 2018-2023 codecalm.net Paweł Kuna
-* Licensed under MIT (https://github.com/tabler/tabler/blob/master/LICENSE)
--->
 <t lang="en">
 
     <head>
@@ -59,6 +59,7 @@ if (isset($_POST["login"])){
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta http-equiv="X-UA-Compatible" content="ie=edge" />
         <title>Sign in ElevenTwelfth</title>
+        <link rel="icon" type="image/png" href="../assets/img/logo-small.png" />
         <!-- CSS files -->
         <link href="<?= base_url('assets/css/tabler.min.css?1692870487') ?>" rel="stylesheet" />
         <link href="<?= base_url('assets/css/tabler-vendors.min.css?1692870487') ?>" rel="stylesheet" />
@@ -165,6 +166,37 @@ if (isset($_POST["login"])){
         });
         </script>
 
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            const usernameInput = document.querySelector('input[name="username"]');
+            const passwordInput = document.querySelector('input[name="password"]');
+
+            form.addEventListener('submit', function(e) {
+                let errorMessage = '';
+
+                if (!usernameInput.value.trim() && !passwordInput.value.trim()) {
+                    errorMessage = 'Username dan Password wajib diisi.';
+                } else if (!usernameInput.value.trim()) {
+                    errorMessage = 'Username wajib diisi.';
+                } else if (!passwordInput.value.trim()) {
+                    errorMessage = 'Password wajib diisi.';
+                }
+
+                if (errorMessage) {
+                    e.preventDefault(); // Mencegah form dikirim
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: errorMessage,
+                    });
+                }
+            });
+        });
+        </script>
+
+
+
         <!-- Libs JS -->
         <script src="<?= base_url('assets/libs/apexcharts/dist/apexcharts.min.js?1692870487') ?>" defer></script>
         <script src="<?= base_url('assets/libs/jsvectormap/dist/js/jsvectormap.min.js?1692870487') ?>" defer></script>
@@ -192,3 +224,5 @@ if (isset($_POST["login"])){
     </body>
 
 </t>
+
+</html>

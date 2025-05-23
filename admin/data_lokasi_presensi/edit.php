@@ -133,7 +133,7 @@ while ($lokasi = mysqli_fetch_array($result)) {
                     </div>
 
                     <div class="mb-3">
-                        <label for="">Radius</label>
+                        <label for="">Radius (Meter)</label>
                         <input type="text" class="form-control" name="radius" value="<?= $radius ?>">
                     </div>
 

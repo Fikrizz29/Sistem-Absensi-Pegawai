@@ -30,6 +30,45 @@
 <!-- sweetalert -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const form = document.getElementById("exportForm");
+    form.addEventListener("submit", function(e) {
+        const tanggalDari = form.querySelector('input[name="tanggal_dari"]').value;
+        const tanggalSampai = form.querySelector('input[name="tanggal_sampai"]').value;
+
+        if (!tanggalDari || !tanggalSampai) {
+            e.preventDefault(); // menghentikan submit
+            alert("Tanggal Awal dan Tanggal Akhir wajib diisi!");
+        }
+    });
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    $('#fotoModal').on('show.bs.modal', function(event) {
+        var button = $(event.relatedTarget); // Tombol yang diklik
+        var fotoUrl = button.data('foto'); // Ambil URL foto
+        var jenis = button.data('jenis'); // Ambil jenis presensi: masuk / keluar
+        var modal = $(this);
+
+        // Atur gambar
+        modal.find('#fotoView').attr('src', fotoUrl);
+
+        // Atur judul modal sesuai jenis
+        if (jenis === 'masuk') {
+            modal.find('#fotoModalLabel').text('Foto Presensi Masuk');
+        } else if (jenis === 'keluar') {
+            modal.find('#fotoModalLabel').text('Foto Presensi Keluar');
+        } else {
+            modal.find('#fotoModalLabel').text('Lihat Foto');
+        }
+    });
+});
+</script>
+
+
 <!-- alert validasi -->
 <?php if (isset($_SESSION['validasi'])) : ?>
 

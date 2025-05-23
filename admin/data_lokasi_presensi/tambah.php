@@ -115,7 +115,7 @@ if(isset($_POST['submit'])) {
                     </div>
 
                     <div class="mb-3">
-                        <label for="">Radius</label>
+                        <label for="">Radius (Meter)</label>
                         <input type="number" class="form-control" name="radius"
                             value="<?php if(isset($_POST['radius'])) echo $_POST['radius'] ?>">
                     </div>

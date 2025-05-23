@@ -64,18 +64,27 @@ $result = mysqli_query($connection, $query);
         </div>
 
         <div class="row">
-            <div class="col-md-">
+            <div class="col-md">
                 <form method="GET">
                     <div class="input-group">
                         <input type="date" class="form-control" name="tanggal_dari"
-                            value="<?= htmlspecialchars($tanggal_dari) ?>">
+                            value="<?= $_GET['tanggal_dari'] ?? '' ?>">
                         <input type="date" class="form-control" name="tanggal_sampai"
-                            value="<?= htmlspecialchars($tanggal_sampai) ?>">
+                            value="<?= $_GET['tanggal_sampai'] ?? '' ?>">
                         <button type="submit" class="btn btn-primary">Tampilkan</button>
                     </div>
                 </form>
             </div>
         </div>
+        <br
+
+        <?php if (empty($_GET['tanggal_dari'])): ?>
+        <span>Rekap Ketidakhadiran Tanggal: <?= date('d F Y') ?></span>
+        <?php else: ?>
+        <span>Rekap Ketidakhadiran Tanggal:
+            <?= date('d F Y', strtotime($_GET['tanggal_dari'])) . ' sampai ' . date('d F Y', strtotime($_GET['tanggal_sampai'])) ?>
+        </span>
+        <?php endif; ?>
 
         <table class="table table-bordered mt-2">
             <tr class="text-center">
